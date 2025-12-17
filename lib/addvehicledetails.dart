@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
-// NOTE: You must ensure this file 'package:internpark/detailsmyvehicle.dart' exists
-// and contains the definition for the 'MyVehicle' widget.
-import 'package:internpark/detailsmyvehicle.dart';
+// NOTE: You must ensure this file 'package:internpark/myvehicle.dart' exists
+import 'package:internpark/myvehicle.dart';
 
 // ------------------------------------------------------------------
-// --- Define Colors for Consistency (Updated with all used colors) ---
+// --- Define Colors for Consistency ---
 // ------------------------------------------------------------------
 const Color _newBodyBackgroundColor = Color(0xFF2A2E33);
-const Color _headerBackgroundColor = Color(
-  0xFF21252B,
-); // Color used for background image fallback/header
+const Color _headerBackgroundColor = Color(0xFF21252B);
 const Color _accentColor = Color(0xFF4C75E5);
-// Colors for the new form screen
 const Color _inputFieldColor = Colors.white;
 const Color _inputBorderColor = Color(0xFF444B54);
 
@@ -20,9 +16,6 @@ const Color _inputBorderColor = Color(0xFF444B54);
 // ------------------------------------------------------------------
 
 void main() {
-  // NOTE: Ensure 'assets/background_login.png' (for the background)
-  // and 'assets/placeholder_vehicle.png' (for the center image)
-  // are available in your assets folder and declared in pubspec.yaml.
   runApp(const VehicleDetailsApp());
 }
 
@@ -31,24 +24,21 @@ class VehicleDetailsApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // A placeholder asset path for the vehicle image, required by AddVehicleDetailsPage
     const placeholderVehiclePath = 'assets/placeholder_vehicle.png';
 
     return MaterialApp(
       title: 'Vehicle Details Form Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // Set the default scaffold background to the body color
         scaffoldBackgroundColor: _newBodyBackgroundColor,
         brightness: Brightness.dark,
         primaryColor: _accentColor,
         colorScheme: const ColorScheme.dark(
           primary: _accentColor,
           secondary: _accentColor,
-          background: _newBodyBackgroundColor,
+          surface: _newBodyBackgroundColor,
         ),
       ),
-      // Set the home to the AddVehicleDetailsPage for direct demonstration
       home: const AddVehicleDetailsPage(
         vehicleImagePath: placeholderVehiclePath,
       ),
@@ -57,7 +47,7 @@ class VehicleDetailsApp extends StatelessWidget {
 }
 
 // ------------------------------------------------------------------
-// --- WIDGET: Full-Width Stretching Image Background (Partial Screen) ---
+// --- WIDGET: Full-Width Stretching Image Background ---
 // ------------------------------------------------------------------
 class _FullWidthDotBackground extends StatelessWidget {
   const _FullWidthDotBackground();
@@ -65,15 +55,10 @@ class _FullWidthDotBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-
-    // Original logic: Height = (Status Bar Padding + 150) + (Remaining Screen Height / 2)
     final double headerHeight = mediaQuery.padding.top + 150;
-    // Calculate the total height for the background image
     final double totalBackgroundHeight =
         headerHeight + (mediaQuery.size.height - headerHeight) / 2;
 
-    // The Positioned widget explicitly sets the calculated height,
-    // achieving the requested partial-screen size background.
     return Positioned(
       top: 0,
       left: 0,
@@ -81,9 +66,8 @@ class _FullWidthDotBackground extends StatelessWidget {
       height: totalBackgroundHeight,
       child: Image.asset(
         'assets/background_login.png',
-        fit: BoxFit.cover, // Ensures the image covers the set area
+        fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
-          // Fallback to a solid background color if the asset is missing
           return Container(color: _headerBackgroundColor);
         },
       ),
@@ -105,32 +89,27 @@ Widget _buildVehicleImage(String imagePath, {double height = 220}) {
     child: Stack(
       alignment: Alignment.center,
       children: [
-        // Layer 1: The large, central gradient glow
         Container(
           width: height * 1.5,
           height: height * 0.9,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            // Using RadialGradient for a perfect central glow effect
             gradient: RadialGradient(
               center: Alignment.center,
               radius: 0.5,
               colors: [
-                _accentColor.withOpacity(0.5), // Center glow
-                _accentColor.withOpacity(0.0), // Fade out to transparent
+                _accentColor.withOpacity(0.5),
+                _accentColor.withOpacity(0.0),
               ],
               stops: const [0.0, 1.0],
             ),
           ),
         ),
-
-        // Layer 2: Vehicle image (on top of the gradient)
         Image.asset(
           imagePath,
           fit: BoxFit.contain,
           height: height * imageDisplayHeight,
           errorBuilder: (context, error, stackTrace) {
-            // Error handling widget
             return Container(
               width: height * 1.5,
               height: height * imageDisplayHeight,
@@ -160,14 +139,13 @@ Widget _buildVehicleImage(String imagePath, {double height = 220}) {
 }
 
 // ------------------------------------------------------------------
-// --- WIDGET: Custom Text Field (Width Adjusted) 📝 ---
+// --- WIDGET: Custom Text Field 📝 ---
 // ------------------------------------------------------------------
 class _VehicleDetailInputField extends StatelessWidget {
   final String label;
   final String hintText;
   final IconData icon;
-  final TextEditingController?
-  controller; // Added controller for form data capture
+  final TextEditingController? controller;
 
   const _VehicleDetailInputField({
     required this.label,
@@ -179,7 +157,6 @@ class _VehicleDetailInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      // Set horizontal padding for input width
       padding: const EdgeInsets.symmetric(horizontal: 50.0, vertical: 10.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,13 +171,13 @@ class _VehicleDetailInputField extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           TextField(
-            controller: controller, // Link controller here
+            controller: controller,
             style: const TextStyle(color: Colors.black, fontSize: 16),
             decoration: InputDecoration(
               filled: true,
               fillColor: _inputFieldColor,
               hintText: hintText,
-              hintStyle: TextStyle(color: _inputBorderColor),
+              hintStyle: const TextStyle(color: _inputBorderColor),
               prefixIcon: Padding(
                 padding: const EdgeInsets.only(left: 15.0, right: 10.0),
                 child: Icon(icon, color: _inputBorderColor, size: 24),
@@ -227,7 +204,143 @@ class _VehicleDetailInputField extends StatelessWidget {
 }
 
 // ------------------------------------------------------------------
-// --- SCREEN: Add Vehicle Details Page (Integrated with Background) ---
+// --- WIDGET: Vehicle Selection Dropdown Field ---
+// ------------------------------------------------------------------
+class _VehicleSelectionField extends StatelessWidget {
+  final String label;
+  final String selectedVehicleImage;
+  final String selectedVehicleName;
+  final List<Map<String, String>> vehicleOptions;
+  final Function(Map<String, String>) onVehicleChanged;
+
+  const _VehicleSelectionField({
+    required this.label,
+    required this.selectedVehicleImage,
+    required this.selectedVehicleName,
+    required this.vehicleOptions,
+    required this.onVehicleChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 50.0, vertical: 10.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: _inputFieldColor,
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: Colors.transparent, width: 0),
+            ),
+            child: Theme(
+              data: Theme.of(
+                context,
+              ).copyWith(canvasColor: _newBodyBackgroundColor),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<Map<String, String>>(
+                  value: vehicleOptions.firstWhere(
+                    (vehicle) => vehicle['image'] == selectedVehicleImage,
+                    orElse: () => vehicleOptions.first,
+                  ),
+                  isExpanded: true,
+                  icon: Padding(
+                    padding: const EdgeInsets.only(right: 15.0),
+                    child: Icon(
+                      Icons.arrow_drop_down,
+                      color: _inputBorderColor,
+                      size: 24,
+                    ),
+                  ),
+                  dropdownColor: _newBodyBackgroundColor,
+                  style: const TextStyle(color: Colors.black, fontSize: 16),
+                  items: vehicleOptions.map((vehicle) {
+                    return DropdownMenuItem<Map<String, String>>(
+                      value: vehicle,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                        child: Row(
+                          children: [
+                            // generic car icon removed
+                            Expanded(
+                              child: Text(
+                                vehicle['name']!,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                ), // changed to white
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Container(
+                              width: 40,
+                              height: 40,
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Image.asset(
+                                vehicle['image']!,
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Icon(
+                                    Icons.directions_car,
+                                    color: Colors.white,
+                                    size: 20,
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (Map<String, String>? newValue) {
+                    if (newValue != null) {
+                      onVehicleChanged(newValue);
+                    }
+                  },
+                  selectedItemBuilder: (BuildContext context) {
+                    return vehicleOptions.map((vehicle) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                        child: Row(
+                          children: [
+                            // generic car icon removed
+                            Expanded(
+                              child: Text(
+                                vehicle['name']!,
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList();
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ------------------------------------------------------------------
+// --- SCREEN: Add Vehicle Details Page ---
 // ------------------------------------------------------------------
 class AddVehicleDetailsPage extends StatefulWidget {
   final String vehicleImagePath;
@@ -239,10 +352,36 @@ class AddVehicleDetailsPage extends StatefulWidget {
 }
 
 class _AddVehicleDetailsPageState extends State<AddVehicleDetailsPage> {
-  // 1. Define controllers to capture form data
   final TextEditingController _plateController = TextEditingController();
   final TextEditingController _modelController = TextEditingController();
   final TextEditingController _insuranceController = TextEditingController();
+
+  final List<Map<String, String>> _vehicleOptions = [
+    {'name': 'Sedan', 'image': 'assets/placeholder_vehicle.png'},
+    {'name': 'SUV', 'image': 'assets/car.png'},
+    {'name': 'Motorcycle', 'image': 'assets/bike.png'},
+    {'name': 'Truck', 'image': 'assets/truck_vehicle.png'},
+  ];
+
+  late String _selectedVehicleImagePath;
+  late String _selectedVehicleName;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedVehicleImagePath = widget.vehicleImagePath;
+    _selectedVehicleName = _vehicleOptions.firstWhere(
+      (vehicle) => vehicle['image'] == widget.vehicleImagePath,
+      orElse: () => _vehicleOptions.first,
+    )['name']!;
+  }
+
+  void _handleVehicleChanged(Map<String, String> newVehicle) {
+    setState(() {
+      _selectedVehicleImagePath = newVehicle['image']!;
+      _selectedVehicleName = newVehicle['name']!;
+    });
+  }
 
   @override
   void dispose() {
@@ -253,19 +392,24 @@ class _AddVehicleDetailsPageState extends State<AddVehicleDetailsPage> {
   }
 
   void _submitDetails() {
-    // Collect the data to pass to the next screen
     final vehicleData = {
       'plate': _plateController.text,
       'model': _modelController.text,
       'insurance': _insuranceController.text,
     };
 
-    // Navigate to the next screen, passing the image path and the collected details
+    if (_plateController.text.isEmpty || _modelController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in the details')),
+      );
+      return;
+    }
+
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => MyVehicle(
-          vehicleImagePath: widget.vehicleImagePath,
+          vehicleImagePath: _selectedVehicleImagePath,
           details: vehicleData,
         ),
       ),
@@ -275,14 +419,9 @@ class _AddVehicleDetailsPageState extends State<AddVehicleDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Keep the scaffold background color for the bottom half of the screen
       backgroundColor: _newBodyBackgroundColor,
-      // We set extendBodyBehindAppBar to true so the body (Stack)
-      // can occupy the full height behind the transparent AppBar.
       extendBodyBehindAppBar: true,
-
       appBar: AppBar(
-        // Set the AppBar background to transparent for the body's Stack to show through
         backgroundColor: Colors.transparent,
         elevation: 0,
         automaticallyImplyLeading: false,
@@ -294,71 +433,38 @@ class _AddVehicleDetailsPageState extends State<AddVehicleDetailsPage> {
           'Add Vehicle Details',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        centerTitle: false,
       ),
-
-      // *** START: Integration of Partial Background using Stack ***
       body: Stack(
         children: [
-          // Layer 1: The partial screen background image
           const _FullWidthDotBackground(),
-
-          // Layer 2: The main scrollable content
           SingleChildScrollView(
-            // Now using ClampingScrollPhysics as the content might need to scroll
-            // when the keyboard is open or on small screens.
             physics: const ClampingScrollPhysics(),
             child: Column(
               children: [
-                // Use a SizedBox to push the content below the AppBar/Status Bar
                 SizedBox(
                   height: MediaQuery.of(context).padding.top + kToolbarHeight,
                 ),
-
-                // Vehicle Image Display Area
                 Center(
                   child: Container(
                     width: MediaQuery.of(context).size.width * 0.9,
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       children: [
-                        // Display the image with big blue gradient background
                         _buildVehicleImage(
-                          widget.vehicleImagePath,
+                          _selectedVehicleImagePath,
                           height: 220,
                         ),
-                        const SizedBox(height: 15),
-                        // 'Change Vehicle' Text Button
-                        TextButton(
-                          onPressed: () {
-                            // Action to change vehicle (returns to previous screen or selection)
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text(
-                            'Change Vehicle',
-                            style: TextStyle(
-                              color: Color.fromARGB(255, 255, 255, 255),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
+                        const SizedBox(height: 5),
                       ],
                     ),
                   ),
                 ),
-
-                // --- Form Area Container ---
-                // NOTE: This container is colored with _newBodyBackgroundColor to cover
-                // the lower part of the _FullWidthDotBackground, ensuring a clean transition.
                 Container(
                   color: _newBodyBackgroundColor,
                   width: double.infinity,
                   child: Column(
                     children: [
                       const SizedBox(height: 1),
-
-                      // The actual form content
                       Column(
                         children: [
                           _VehicleDetailInputField(
@@ -366,6 +472,13 @@ class _AddVehicleDetailsPageState extends State<AddVehicleDetailsPage> {
                             hintText: 'Enter Plate Number',
                             icon: Icons.directions_car,
                             controller: _plateController,
+                          ),
+                          _VehicleSelectionField(
+                            label: 'Vehicle Type',
+                            selectedVehicleImage: _selectedVehicleImagePath,
+                            selectedVehicleName: _selectedVehicleName,
+                            vehicleOptions: _vehicleOptions,
+                            onVehicleChanged: _handleVehicleChanged,
                           ),
                           _VehicleDetailInputField(
                             label: 'Vehicle Model',
@@ -382,8 +495,6 @@ class _AddVehicleDetailsPageState extends State<AddVehicleDetailsPage> {
                           const SizedBox(height: 20),
                         ],
                       ),
-
-                      // Add Now Button
                       Padding(
                         padding: const EdgeInsets.only(bottom: 40),
                         child: Padding(
@@ -391,7 +502,7 @@ class _AddVehicleDetailsPageState extends State<AddVehicleDetailsPage> {
                             horizontal: 100.0,
                           ),
                           child: ElevatedButton(
-                            onPressed: _submitDetails, // Call the submit method
+                            onPressed: _submitDetails,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: _accentColor,
                               foregroundColor: Colors.white,
@@ -410,9 +521,8 @@ class _AddVehicleDetailsPageState extends State<AddVehicleDetailsPage> {
                           ),
                         ),
                       ),
-                      // Final spacer for safe area at the bottom
                       SizedBox(
-                        height: MediaQuery.of(context).padding.bottom + 10,
+                        height: MediaQuery.of(context).padding.bottom + 1,
                       ),
                     ],
                   ),
@@ -422,7 +532,6 @@ class _AddVehicleDetailsPageState extends State<AddVehicleDetailsPage> {
           ),
         ],
       ),
-      // *** END: Integration of Partial Background using Stack ***
     );
   }
 }

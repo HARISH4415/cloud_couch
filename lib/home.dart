@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:internpark/book.dart';
+import 'package:internpark/addvehicledetails.dart';
 import 'package:internpark/explore.dart';
-import 'package:internpark/service.dart';
+import 'package:internpark/myvehicle.dart';
+import 'package:internpark/profile.dart';
 
 // --- Define Colors for Consistency ---
 const Color _newBodyBackgroundColor = Color(0xFF2A2E33);
@@ -12,7 +13,6 @@ const Color _accentColor = Color(
 
 // ------------------------------------------------------------------
 // ## UTILITY: Radial Gradient Glow Widget (NEW) 🚗✨
-// Based on the logic from the first code block, simplified for reusability.
 // ------------------------------------------------------------------
 class _RadialGradientGlow extends StatelessWidget {
   final double size; // Width and height of the gradient container
@@ -92,6 +92,7 @@ class NavigationHost extends StatefulWidget {
 
 class _NavigationHostState extends State<NavigationHost> {
   int _selectedIndex = 0;
+  bool _isSearching = false;
 
   final List<String> _vehicleImages = const [
     'assets/car.png',
@@ -105,19 +106,31 @@ class _NavigationHostState extends State<NavigationHost> {
 
   @override
   void initState() {
-    super.initState(); 
+    super.initState();
     _pages = [
-      VehicleCarouselPage(vehicleImages: _vehicleImages),
-      const BookApp(),
+      VehicleCarouselPage(
+        vehicleImages: _vehicleImages,
+        onArrowPressed: () => _onItemTapped(1),
+      ),
+      // Pass a callback to the Explore page to allow it to change the state
+      ExploreScreen(
+        onBackToHome: () => _onItemTapped(0),
+        onSearchStateChanged: (isSearching) {
+          setState(() {
+            _isSearching = isSearching;
+          });
+        },
+      ),
       const PlaceholderPage(title: 'Chatbot Interface', color: Colors.blueGrey),
       const PlaceholderPage(title: 'Saved Items', color: Colors.orange),
-      const PlaceholderPage(title: 'Profile Settings', color: Colors.red),
+      const ProfileScreen(),
     ];
   }
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      _isSearching = false; // Reset search state when navigating
     });
   }
 
@@ -239,26 +252,30 @@ class _NavigationHostState extends State<NavigationHost> {
   Widget build(BuildContext context) {
     const double navBarHeight = 150.0; //Floating icon height consideration
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    
-    // Check if the current page is the 'Explore' page (index 1)
-    final bool isExplorePage = _selectedIndex == 1;
+
+    // Hide bottom navbar and floating icon when searching
+    final bool hideBottomUI = _isSearching;
+    final bool showFloatingIcon = _selectedIndex == 0 || _selectedIndex == 1; // ithu vanthu floating icon display condition
 
     return Scaffold(
       backgroundColor: _newBodyBackgroundColor,
       body: Stack(
         children: [
+          // 1. Current Page Content
           _pages[_selectedIndex],
-          // --- Conditional Bottom Navigation Bar ---
-          if (!isExplorePage)
+
+          // 2. Bottom Navigation Bar (Hidden when searching)
+          if (!hideBottomUI)
             Align(
               alignment: Alignment.bottomCenter,
               child: _buildCustomBottomNavBar(),
             ),
-          // --- Conditional Floating Chatbot Icon ---
-          if (!isExplorePage)
+
+          // 3. Floating Chatbot Icon (Hidden when searching)
+          if (showFloatingIcon)
             Positioned(
               right: 20,
-              bottom: navBarHeight + bottomPadding - 10,
+              bottom: navBarHeight + bottomPadding - 50, //ithu vanthu floating icon oda position
               child: _buildFloatingChatbotIcon(),
             ),
         ],
@@ -301,7 +318,12 @@ class _FullWidthDotBackground extends StatelessWidget {
 // ------------------------------------------------------------------
 class _AppBarHeader extends StatelessWidget {
   final bool useBackgroundColor;
-  const _AppBarHeader({super.key, this.useBackgroundColor = true});
+  final VoidCallback? onArrowPressed;
+  const _AppBarHeader({
+    super.key,
+    this.useBackgroundColor = true,
+    this.onArrowPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -313,11 +335,11 @@ class _AppBarHeader extends StatelessWidget {
         right: 20,
         bottom: 20,
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
@@ -331,12 +353,12 @@ class _AppBarHeader extends StatelessWidget {
               Icon(Icons.menu, color: Colors.white, size: 30),
             ],
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Row(
             children: [
-              Icon(Icons.location_on, color: Colors.white, size: 20),
-              SizedBox(width: 5),
-              Text(
+              const Icon(Icons.location_on, color: Colors.white, size: 20),
+              const SizedBox(width: 5),
+              const Text(
                 'Pondicherry',
                 style: TextStyle(
                   color: Colors.white,
@@ -344,11 +366,18 @@ class _AppBarHeader extends StatelessWidget {
                   fontWeight: FontWeight.w200,
                 ),
               ),
-              Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
+              GestureDetector(
+                onTap: onArrowPressed,
+                child: const Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.white,
+                  size: 16,
+                ),
+              ),
             ],
           ),
-          SizedBox(height: 5),
-          Text(
+          const SizedBox(height: 5),
+          const Text(
             'Pick your vehicle',
             style: TextStyle(
               color: Colors.white,
@@ -367,8 +396,13 @@ class _AppBarHeader extends StatelessWidget {
 // ------------------------------------------------------------------
 class VehicleCarouselPage extends StatefulWidget {
   final List<String> vehicleImages;
+  final VoidCallback? onArrowPressed;
 
-  const VehicleCarouselPage({super.key, required this.vehicleImages});
+  const VehicleCarouselPage({
+    super.key,
+    required this.vehicleImages,
+    this.onArrowPressed,
+  });
 
   @override
   State<VehicleCarouselPage> createState() => _VehicleCarouselPageState();
@@ -448,7 +482,10 @@ class _VehicleCarouselPageState extends State<VehicleCarouselPage> {
           child: Column(
             children: [
               // --- 1. Header (Top part) ---
-              const _AppBarHeader(useBackgroundColor: false),
+              _AppBarHeader(
+                useBackgroundColor: false,
+                onArrowPressed: widget.onArrowPressed,
+              ),
 
               // --- 2. Vehicle Carousel Area (Image Only) ---
               SizedBox(
@@ -529,7 +566,33 @@ class _VehicleCarouselPageState extends State<VehicleCarouselPage> {
                     // 'My Vehicle' Button
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          // 1. Get the currently focused image from the carousel
+                          final int virtualIndex = _currentPage.round();
+                          final int actualIndex = _getActualIndex(virtualIndex);
+                          final String currentSelectedImage =
+                              widget.vehicleImages[actualIndex];
+
+                          // 2. Define the details map to be shown in MyVehicle
+                          final Map<String, String> vehicleDetails = {
+                            'model': 'Yamaha MT-07',
+                            'plate': 'PY 01 BY 9999',
+                            'insurance': 'VIN: XYZ123ABC987DEF',
+                          };
+
+                          // 3. Navigate to the MyVehicle page
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MyVehicle(
+                                vehicleImagePath:
+                                    currentSelectedImage, // Passes current carousel image
+                                details:
+                                    vehicleDetails, // Passes the details map
+                              ),
+                            ),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: _accentColor,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:internpark/home.dart';
+import 'package:internpark/details1.dart';
+import 'package:internpark/explore.dart';
 import 'package:intl/intl.dart'; // Required for date formatting
 
 // --- Define Colors for Consistency ---
@@ -190,9 +191,10 @@ class _BookScreenState extends State<BookScreen> {
       children: [
         // Back Button
         GestureDetector(
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => const NavigationHost()),
-          ),
+          onTap: () {
+            // Pop the current screen to go back to the previous page
+            Navigator.push(context, MaterialPageRoute(builder:  (context) => ParkingApp()));
+          },
           child: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
         ),
         const SizedBox(width: 15),
