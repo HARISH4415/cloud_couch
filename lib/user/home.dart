@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:internpark/addvehicledetails.dart';
-import 'package:internpark/explore.dart';
-import 'package:internpark/myvehicle.dart';
-import 'package:internpark/profile.dart';
+import 'package:internpark/user/addvehicledetails.dart';
+import 'package:internpark/user/explore.dart';
+import 'package:internpark/user/myvehicle.dart';
+import 'package:internpark/user/profile.dart';
 
 // --- Define Colors for Consistency ---
 const Color _newBodyBackgroundColor = Color(0xFF2A2E33);
@@ -255,7 +255,9 @@ class _NavigationHostState extends State<NavigationHost> {
 
     // Hide bottom navbar and floating icon when searching
     final bool hideBottomUI = _isSearching;
-    final bool showFloatingIcon = _selectedIndex == 0 || _selectedIndex == 1; // ithu vanthu floating icon display condition
+    final bool showFloatingIcon =
+        _selectedIndex == 0 ||
+        _selectedIndex == 1; // ithu vanthu floating icon display condition
 
     return Scaffold(
       backgroundColor: _newBodyBackgroundColor,
@@ -275,7 +277,10 @@ class _NavigationHostState extends State<NavigationHost> {
           if (showFloatingIcon)
             Positioned(
               right: 20,
-              bottom: navBarHeight + bottomPadding - 50, //ithu vanthu floating icon oda position
+              bottom:
+                  navBarHeight +
+                  bottomPadding -
+                  50, //ithu vanthu floating icon oda position
               child: _buildFloatingChatbotIcon(),
             ),
         ],

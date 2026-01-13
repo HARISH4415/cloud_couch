@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:internpark/addvehicledetails.dart';
-import 'package:internpark/explore.dart';
+import 'package:internpark/user/addvehicledetails.dart';
+import 'package:internpark/user/explore.dart';
 
 // ------------------------------------------------------------------
 // --- Define Colors for Consistency 🎨 ---

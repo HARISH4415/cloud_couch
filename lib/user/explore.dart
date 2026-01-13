@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:internpark/book.dart';
-import 'package:internpark/details1.dart';
-import 'package:internpark/home.dart';
+import 'package:internpark/user/book.dart';
+import 'package:internpark/user/details1.dart';
+import 'package:internpark/user/home.dart';
 
 // ------------------------------------------------------------------
 // --- Define Colors for Consistency (Combined from both snippets) ---

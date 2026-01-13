@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
-// NOTE: You must ensure this file 'package:internpark/myvehicle.dart' exists
-import 'package:internpark/myvehicle.dart';
+import 'package:internpark/user/explore.dart';
+// NOTE: You must ensure this file 'package:internpark/detailsmyvehicle.dart' exists
+// and contains the definition for the 'MyVehicle' widget.
+import 'package:internpark/user/myvehicle.dart';
 
 // ------------------------------------------------------------------
-// --- Define Colors for Consistency ---
+// --- Define Colors for Consistency (Updated with all used colors) ---
 // ------------------------------------------------------------------
 const Color _newBodyBackgroundColor = Color(0xFF2A2E33);
-const Color _headerBackgroundColor = Color(0xFF21252B);
+const Color _headerBackgroundColor = Color(
+  0xFF21252B,
+); // Color used for background image fallback/header
 const Color _accentColor = Color(0xFF4C75E5);
+// Colors for the new form screen
 const Color _inputFieldColor = Colors.white;
 const Color _inputBorderColor = Color(0xFF444B54);
 
@@ -16,6 +21,9 @@ const Color _inputBorderColor = Color(0xFF444B54);
 // ------------------------------------------------------------------
 
 void main() {
+  // NOTE: Ensure 'assets/background_login.png' (for the background)
+  // and 'assets/placeholder_vehicle.png' (for the center image)
+  // are available in your assets folder and declared in pubspec.yaml.
   runApp(const VehicleDetailsApp());
 }
 
@@ -24,21 +32,24 @@ class VehicleDetailsApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // A placeholder asset path for the vehicle image, required by AddVehicleDetailsPage
     const placeholderVehiclePath = 'assets/placeholder_vehicle.png';
 
     return MaterialApp(
       title: 'Vehicle Details Form Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        // Set the default scaffold background to the body color
         scaffoldBackgroundColor: _newBodyBackgroundColor,
         brightness: Brightness.dark,
         primaryColor: _accentColor,
         colorScheme: const ColorScheme.dark(
           primary: _accentColor,
           secondary: _accentColor,
-          surface: _newBodyBackgroundColor,
+          background: _newBodyBackgroundColor,
         ),
       ),
+      // Set the home to the AddVehicleDetailsPage for direct demonstration
       home: const AddVehicleDetailsPage(
         vehicleImagePath: placeholderVehiclePath,
       ),
@@ -47,7 +58,7 @@ class VehicleDetailsApp extends StatelessWidget {
 }
 
 // ------------------------------------------------------------------
-// --- WIDGET: Full-Width Stretching Image Background ---
+// --- WIDGET: Full-Width Stretching Image Background (Partial Screen) ---
 // ------------------------------------------------------------------
 class _FullWidthDotBackground extends StatelessWidget {
   const _FullWidthDotBackground();
@@ -55,10 +66,15 @@ class _FullWidthDotBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
+
+    // Original logic: Height = (Status Bar Padding + 150) + (Remaining Screen Height / 2)
     final double headerHeight = mediaQuery.padding.top + 150;
+    // Calculate the total height for the background image
     final double totalBackgroundHeight =
         headerHeight + (mediaQuery.size.height - headerHeight) / 2;
 
+    // The Positioned widget explicitly sets the calculated height,
+    // achieving the requested partial-screen size background.
     return Positioned(
       top: 0,
       left: 0,
@@ -66,8 +82,9 @@ class _FullWidthDotBackground extends StatelessWidget {
       height: totalBackgroundHeight,
       child: Image.asset(
         'assets/background_login.png',
-        fit: BoxFit.cover,
+        fit: BoxFit.cover, // Ensures the image covers the set area
         errorBuilder: (context, error, stackTrace) {
+          // Fallback to a solid background color if the asset is missing
           return Container(color: _headerBackgroundColor);
         },
       ),
@@ -89,27 +106,32 @@ Widget _buildVehicleImage(String imagePath, {double height = 220}) {
     child: Stack(
       alignment: Alignment.center,
       children: [
+        // Layer 1: The large, central gradient glow
         Container(
           width: height * 1.5,
           height: height * 0.9,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
+            // Using RadialGradient for a perfect central glow effect
             gradient: RadialGradient(
               center: Alignment.center,
               radius: 0.5,
               colors: [
-                _accentColor.withOpacity(0.5),
-                _accentColor.withOpacity(0.0),
+                _accentColor.withOpacity(0.5), // Center glow
+                _accentColor.withOpacity(0.0), // Fade out to transparent
               ],
               stops: const [0.0, 1.0],
             ),
           ),
         ),
+
+        // Layer 2: Vehicle image (on top of the gradient)
         Image.asset(
           imagePath,
           fit: BoxFit.contain,
           height: height * imageDisplayHeight,
           errorBuilder: (context, error, stackTrace) {
+            // Error handling widget
             return Container(
               width: height * 1.5,
               height: height * imageDisplayHeight,
@@ -139,13 +161,14 @@ Widget _buildVehicleImage(String imagePath, {double height = 220}) {
 }
 
 // ------------------------------------------------------------------
-// --- WIDGET: Custom Text Field 📝 ---
+// --- WIDGET: Custom Text Field (Width Adjusted) 📝 ---
 // ------------------------------------------------------------------
 class _VehicleDetailInputField extends StatelessWidget {
   final String label;
   final String hintText;
   final IconData icon;
-  final TextEditingController? controller;
+  final TextEditingController?
+  controller; // Added controller for form data capture
 
   const _VehicleDetailInputField({
     required this.label,
@@ -157,6 +180,7 @@ class _VehicleDetailInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
+      // Set horizontal padding for input width
       padding: const EdgeInsets.symmetric(horizontal: 50.0, vertical: 10.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,13 +195,13 @@ class _VehicleDetailInputField extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           TextField(
-            controller: controller,
+            controller: controller, // Link controller here
             style: const TextStyle(color: Colors.black, fontSize: 16),
             decoration: InputDecoration(
               filled: true,
               fillColor: _inputFieldColor,
               hintText: hintText,
-              hintStyle: const TextStyle(color: _inputBorderColor),
+              hintStyle: TextStyle(color: _inputBorderColor),
               prefixIcon: Padding(
                 padding: const EdgeInsets.only(left: 15.0, right: 10.0),
                 child: Icon(icon, color: _inputBorderColor, size: 24),
@@ -204,143 +228,7 @@ class _VehicleDetailInputField extends StatelessWidget {
 }
 
 // ------------------------------------------------------------------
-// --- WIDGET: Vehicle Selection Dropdown Field ---
-// ------------------------------------------------------------------
-class _VehicleSelectionField extends StatelessWidget {
-  final String label;
-  final String selectedVehicleImage;
-  final String selectedVehicleName;
-  final List<Map<String, String>> vehicleOptions;
-  final Function(Map<String, String>) onVehicleChanged;
-
-  const _VehicleSelectionField({
-    required this.label,
-    required this.selectedVehicleImage,
-    required this.selectedVehicleName,
-    required this.vehicleOptions,
-    required this.onVehicleChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 50.0, vertical: 10.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            decoration: BoxDecoration(
-              color: _inputFieldColor,
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: Colors.transparent, width: 0),
-            ),
-            child: Theme(
-              data: Theme.of(
-                context,
-              ).copyWith(canvasColor: _newBodyBackgroundColor),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<Map<String, String>>(
-                  value: vehicleOptions.firstWhere(
-                    (vehicle) => vehicle['image'] == selectedVehicleImage,
-                    orElse: () => vehicleOptions.first,
-                  ),
-                  isExpanded: true,
-                  icon: Padding(
-                    padding: const EdgeInsets.only(right: 15.0),
-                    child: Icon(
-                      Icons.arrow_drop_down,
-                      color: _inputBorderColor,
-                      size: 24,
-                    ),
-                  ),
-                  dropdownColor: _newBodyBackgroundColor,
-                  style: const TextStyle(color: Colors.black, fontSize: 16),
-                  items: vehicleOptions.map((vehicle) {
-                    return DropdownMenuItem<Map<String, String>>(
-                      value: vehicle,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                        child: Row(
-                          children: [
-                            // generic car icon removed
-                            Expanded(
-                              child: Text(
-                                vehicle['name']!,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                ), // changed to white
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Container(
-                              width: 40,
-                              height: 40,
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Image.asset(
-                                vehicle['image']!,
-                                fit: BoxFit.contain,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return const Icon(
-                                    Icons.directions_car,
-                                    color: Colors.white,
-                                    size: 20,
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (Map<String, String>? newValue) {
-                    if (newValue != null) {
-                      onVehicleChanged(newValue);
-                    }
-                  },
-                  selectedItemBuilder: (BuildContext context) {
-                    return vehicleOptions.map((vehicle) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                        child: Row(
-                          children: [
-                            // generic car icon removed
-                            Expanded(
-                              child: Text(
-                                vehicle['name']!,
-                                style: const TextStyle(color: Colors.black),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList();
-                  },
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ------------------------------------------------------------------
-// --- SCREEN: Add Vehicle Details Page ---
+// --- SCREEN: Add Vehicle Details Page (Integrated with Background) ---
 // ------------------------------------------------------------------
 class AddVehicleDetailsPage extends StatefulWidget {
   final String vehicleImagePath;
@@ -356,6 +244,8 @@ class _AddVehicleDetailsPageState extends State<AddVehicleDetailsPage> {
   final TextEditingController _modelController = TextEditingController();
   final TextEditingController _insuranceController = TextEditingController();
 
+  // --- NEW: Dropdown State Logic ---
+  // List of available vehicles with their names and image paths
   final List<Map<String, String>> _vehicleOptions = [
     {'name': 'Sedan', 'image': 'assets/placeholder_vehicle.png'},
     {'name': 'SUV', 'image': 'assets/car.png'},
@@ -369,19 +259,15 @@ class _AddVehicleDetailsPageState extends State<AddVehicleDetailsPage> {
   @override
   void initState() {
     super.initState();
+    // Initialize with the path passed from the previous screen
     _selectedVehicleImagePath = widget.vehicleImagePath;
+    // Find the corresponding vehicle name
     _selectedVehicleName = _vehicleOptions.firstWhere(
       (vehicle) => vehicle['image'] == widget.vehicleImagePath,
       orElse: () => _vehicleOptions.first,
     )['name']!;
   }
-
-  void _handleVehicleChanged(Map<String, String> newVehicle) {
-    setState(() {
-      _selectedVehicleImagePath = newVehicle['image']!;
-      _selectedVehicleName = newVehicle['name']!;
-    });
-  }
+  // ---------------------------------
 
   @override
   void dispose() {
@@ -409,9 +295,12 @@ class _AddVehicleDetailsPageState extends State<AddVehicleDetailsPage> {
       context,
       MaterialPageRoute(
         builder: (context) => MyVehicle(
-          vehicleImagePath: _selectedVehicleImagePath,
+          vehicleImagePath:
+              _selectedVehicleImagePath, // Pass the selected image
           details: vehicleData,
         ),
+       
+
       ),
     );
   }
@@ -450,11 +339,144 @@ class _AddVehicleDetailsPageState extends State<AddVehicleDetailsPage> {
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       children: [
+                        // The image now uses the state variable _selectedVehicleImagePath
                         _buildVehicleImage(
                           _selectedVehicleImagePath,
                           height: 220,
                         ),
                         const SizedBox(height: 5),
+
+                        // --- NEW: Vehicle Selection Container with Dropdown ---
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: _accentColor.withOpacity(0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Select Vehicle Type',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: _newBodyBackgroundColor,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: _inputBorderColor,
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Theme(
+                                  data: Theme.of(context).copyWith(
+                                    canvasColor: _newBodyBackgroundColor,
+                                  ),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<Map<String, String>>(
+                                      value: _vehicleOptions.firstWhere(
+                                        (vehicle) =>
+                                            vehicle['image'] ==
+                                            _selectedVehicleImagePath,
+                                      ),
+                                      isExpanded: true,
+                                      icon: const Icon(
+                                        Icons.arrow_drop_down,
+                                        color: Colors.white,
+                                      ),
+                                      dropdownColor: _newBodyBackgroundColor,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                      ),
+                                      items: _vehicleOptions.map((vehicle) {
+                                        return DropdownMenuItem<
+                                          Map<String, String>
+                                        >(
+                                          value: vehicle,
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8.0,
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  width: 40,
+                                                  height: 40,
+                                                  padding: const EdgeInsets.all(
+                                                    4,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white
+                                                        .withOpacity(0.1),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          8,
+                                                        ),
+                                                  ),
+                                                  child: Image.asset(
+                                                    vehicle['image']!,
+                                                    fit: BoxFit.contain,
+                                                    errorBuilder:
+                                                        (
+                                                          context,
+                                                          error,
+                                                          stackTrace,
+                                                        ) {
+                                                          return const Icon(
+                                                            Icons
+                                                                .directions_car,
+                                                            color: Colors.white,
+                                                            size: 20,
+                                                          );
+                                                        },
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 12),
+                                                Text(
+                                                  vehicle['name']!,
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                      onChanged:
+                                          (Map<String, String>? newValue) {
+                                            if (newValue != null) {
+                                              setState(() {
+                                                _selectedVehicleImagePath =
+                                                    newValue['image']!;
+                                                _selectedVehicleName =
+                                                    newValue['name']!;
+                                              });
+                                            }
+                                          },
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // ----------------------------------------
                       ],
                     ),
                   ),
@@ -473,13 +495,6 @@ class _AddVehicleDetailsPageState extends State<AddVehicleDetailsPage> {
                             icon: Icons.directions_car,
                             controller: _plateController,
                           ),
-                          _VehicleSelectionField(
-                            label: 'Vehicle Type',
-                            selectedVehicleImage: _selectedVehicleImagePath,
-                            selectedVehicleName: _selectedVehicleName,
-                            vehicleOptions: _vehicleOptions,
-                            onVehicleChanged: _handleVehicleChanged,
-                          ),
                           _VehicleDetailInputField(
                             label: 'Vehicle Model',
                             hintText: 'Enter vehicle model',
@@ -492,7 +507,7 @@ class _AddVehicleDetailsPageState extends State<AddVehicleDetailsPage> {
                             icon: Icons.security,
                             controller: _insuranceController,
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 15),
                         ],
                       ),
                       Padding(

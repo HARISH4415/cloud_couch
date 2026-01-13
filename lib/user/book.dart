@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:internpark/details1.dart';
-import 'package:internpark/explore.dart';
+import 'package:internpark/user/details1.dart';
+import 'package:internpark/user/explore.dart';
 import 'package:intl/intl.dart'; // Required for date formatting
 
 // --- Define Colors for Consistency ---
